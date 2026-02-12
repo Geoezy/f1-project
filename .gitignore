@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+venv/
+.env
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+server.log
+nohup.out
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Lock files
+*.lock
+!requirements.txt
+
+# Debug/temp scripts
+debug_*.py
+audit_*.py
+mock_*.py
+fix_*.py
+update_images.py
+download_images.sh
+inject_*.py
+debug_winner_query.py
+
+# Gemini artifacts
+.gemini/

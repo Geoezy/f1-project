@@ -1,0 +1,488 @@
+:root {
+    --bg-dark: #0a0a12;
+    --glass-bg: rgba(20, 20, 35, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.08);
+    --accent-color: #ff1e00;
+    /* F1 Red */
+    --accent-glow: rgba(255, 30, 0, 0.4);
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0b0;
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-body);
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.background-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+        radial-gradient(circle at 10% 20%, rgba(255, 30, 0, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 200, 255, 0.05) 0%, transparent 40%);
+    z-index: -1;
+}
+
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Header */
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
+h1 {
+    font-family: var(--font-heading);
+    font-size: 2.5rem;
+    letter-spacing: 2px;
+    margin: 0;
+    text-shadow: 0 0 15px var(--accent-glow);
+}
+
+.accent {
+    color: var(--accent-color);
+}
+
+/* Glass Components */
+.glass-panel,
+.glass-select,
+.glass-nav {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Select */
+.glass-select {
+    color: white;
+    padding: 10px 20px;
+    font-family: var(--font-heading);
+    font-size: 1rem;
+    outline: none;
+    cursor: pointer;
+    background-color: rgba(20, 20, 35, 0.8);
+    /* Darker for readability */
+}
+
+/* Navigation */
+.glass-nav {
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    margin-bottom: 30px;
+    gap: 15px;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-family: var(--font-heading);
+    font-size: 1.1rem;
+    padding: 10px 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 8px;
+}
+
+.nav-btn:hover {
+    color: white;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.nav-btn.active {
+    color: var(--accent-color);
+    background: rgba(255, 30, 0, 0.1);
+    box-shadow: 0 0 15px var(--accent-glow);
+}
+
+/* Hero Section */
+.hero {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 40px;
+    min-height: 250px;
+}
+
+.hero-content {
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-content::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.02));
+    z-index: 0;
+}
+
+.hero h2 {
+    font-family: var(--font-heading);
+    color: var(--text-secondary);
+    font-size: 1rem;
+    letter-spacing: 4px;
+    margin: 0 0 20px 0;
+    z-index: 1;
+}
+
+.countdown {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 15px;
+    z-index: 1;
+}
+
+.time-block {
+    text-align: center;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px 15px;
+    border-radius: 8px;
+    min-width: 60px;
+    border: 1px solid var(--glass-border);
+}
+
+.time-block span {
+    display: block;
+    font-family: var(--font-heading);
+    font-size: 2rem;
+    font-weight: 700;
+    color: white;
+}
+
+.time-block small {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    margin-top: 5px;
+}
+
+#next-race-name {
+    font-size: 1.8rem;
+    margin: 10px 0 5px 0;
+    z-index: 1;
+}
+
+.stats-preview {
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Masonry Grid */
+.masonry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-auto-rows: 20px;
+    /* Base row height for spanning */
+    gap: 20px;
+}
+
+.race-card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.27);
+    cursor: pointer;
+    /* Grid spanning done in JS or set fixed height classes */
+    grid-row-end: span 14;
+    /* Default span */
+}
+
+.race-card.featured {
+    grid-row-end: span 18;
+    /* Taller card */
+}
+
+.race-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.6);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.card-image-container {
+    height: 180px;
+    overflow: hidden;
+    position: relative;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.card-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    padding: 20px;
+    filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5));
+    transition: transform 0.5s ease;
+}
+
+.race-card:hover .card-image-container img {
+    transform: scale(1.1);
+}
+
+.card-content {
+    padding: 20px;
+}
+
+.race-round {
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    color: var(--accent-color);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.race-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+    line-height: 1.3;
+}
+
+.race-date,
+.race-circuit {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+}
+
+.status-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    backdrop-filter: blur(4px);
+}
+
+.status-completed {
+    background: rgba(0, 255, 100, 0.2);
+    color: #00ff64;
+    border: 1px solid rgba(0, 255, 100, 0.3);
+}
+
+.status-upcoming {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+    border: 1px solid rgba(255, 165, 0, 0.3);
+}
+
+/* Tables */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 15px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.data-table th {
+    font-family: var(--font-heading);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+}
+
+.data-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.data-table tbody tr:first-child .pos-cell {
+    color: #ffd700;
+    /* Gold */
+}
+
+/* Utility */
+.full-width {
+    width: 100%;
+}
+
+.mt-2 {
+    margin-top: 20px;
+}
+
+.mb-2 {
+    margin-bottom: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    .masonry-grid {
+        grid-template-columns: repeat(auto-fill, minmax(100%, 1fr));
+    }
+}
+
+/* Modal */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: #1a1a2e;
+    /* Solid background for readability */
+    padding: 30px;
+    position: relative;
+    border: 1px solid var(--glass-border);
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+/* Team Colors */
+:root {
+    --team-mercedes: #00d2be;
+    --team-ferrari: #dc0000;
+    --team-red-bull: #0600ef;
+    --team-mclaren: #ff8700;
+    --team-alpine: #0090ff;
+    --team-rb: #6692ff;
+    --team-aston-martin: #229971;
+    --team-haas: #b6babd;
+    --team-williams: #64c4ff;
+    --team-sauber: #52e252;
+}
+
+.team-border-Mercedes {
+    border-left: 4px solid var(--team-mercedes);
+}
+
+.team-border-Ferrari {
+    border-left: 4px solid var(--team-ferrari);
+}
+
+.team-border-Red-Bull {
+    border-left: 4px solid var(--team-red-bull);
+}
+
+.team-border-McLaren {
+    border-left: 4px solid var(--team-mclaren);
+}
+
+.team-border-Alpine {
+    border-left: 4px solid var(--team-alpine);
+}
+
+.team-border-RB {
+    border-left: 4px solid var(--team-rb);
+}
+
+.team-border-Aston-Martin {
+    border-left: 4px solid var(--team-aston-martin);
+}
+
+.team-border-Haas {
+    border-left: 4px solid var(--team-haas);
+}
+
+.team-border-Williams {
+    border-left: 4px solid var(--team-williams);
+}
+
+.team-border-Sauber {
+    border-left: 4px solid var(--team-sauber);
+}
+
+/* Normalized class names handling spaces if any */
+.team-border-Red_Bull {
+    border-left: 4px solid var(--team-red-bull);
+}
+
+.team-border-Aston_Martin {
+    border-left: 4px solid var(--team-aston-martin);
+}
+
+.champion-card {
+    background: linear-gradient(135deg, rgba(255, 215, 0, 0.1), rgba(0, 0, 0, 0.4));
+    border: 1px solid #ffd700;
+    padding: 20px;
+    border-radius: 16px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+    animation: glow 3s infinite alternate;
+}
+
+.champion-crown {
+    font-size: 3rem;
+    filter: drop-shadow(0 0 10px gold);
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);
+    }
+
+    to {
+        box-shadow: 0 0 25px rgba(255, 215, 0, 0.5);
+    }
+}
