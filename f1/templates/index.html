@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="no-referrer">
+    <title>F1 Data Hub</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@300;400;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        f1red: '#e10600',
+                        darkbg: '#15151e',
+                        cardbg: '#1f1f27',
+                        accent: '#e10600'
+                    },
+                    fontFamily: {
+                        sans: ['Titillium Web', 'sans-serif'],
+                        heading: ['Titillium Web', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-darkbg text-gray-100 font-sans min-h-screen flex flex-col">
+
+    <!-- Navbar -->
+    <nav class="bg-cardbg border-b border-gray-800 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <div class="flex items-center">
+                    <div class="text-3xl font-bold italic tracking-tighter text-f1red mr-8 cursor-pointer select-none">
+                        F1<span class="text-white">HUB</span>
+                    </div>
+
+                    <!-- Desktop Nav -->
+                    <div class="hidden md:flex space-x-1">
+                        <button onclick="app.switchView('schedule')"
+                            class="nav-item active px-4 py-2 hover:bg-gray-800 rounded transition-colors">Schedule</button>
+                        <button onclick="app.switchView('results')"
+                            class="nav-item px-4 py-2 hover:bg-gray-800 rounded transition-colors">Results</button>
+                        <button onclick="app.switchView('drivers')"
+                            class="nav-item px-4 py-2 hover:bg-gray-800 rounded transition-colors">Drivers</button>
+                        <button onclick="app.switchView('constructors')"
+                            class="nav-item px-4 py-2 hover:bg-gray-800 rounded transition-colors">Teams</button>
+                    </div>
+                </div>
+
+                <!-- Live/Status -->
+                <div class="flex items-center gap-4">
+                    <span class="px-2 py-1 bg-green-900 text-green-300 text-xs font-bold rounded animate-pulse">LIVE
+                        DATA</span>
+                    <div class="text-xs text-gray-500 font-mono" id="header-season-display">SEASON 2026</div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-8 w-full relative">
+
+        <!-- Loading Overlay -->
+        <div id="loading" class="hidden absolute inset-0 bg-darkbg bg-opacity-90 z-40 flex items-center justify-center">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-f1red"></div>
+        </div>
+
+        <!-- Hero / Next Race (Visible on Schedule/Results) -->
+        <div id="next-race-countdown"
+            class="mb-8 glass-panel p-6 bg-gradient-to-r from-gray-900 to-gray-800 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4 opacity-10">
+                <i class="text-9xl font-bold italic">F1</i>
+            </div>
+            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between">
+                <div>
+                    <div class="text-f1red font-bold uppercase tracking-widest text-sm mb-1">Upcoming Grand Prix</div>
+                    <h1 id="next-race-name" class="text-4xl md:text-5xl font-heading font-bold italic mb-2">LOADING...
+                    </h1>
+                    <div id="next-race-date" class="text-xl text-gray-400"></div>
+                </div>
+                <div class="mt-4 md:mt-0 text-right">
+                    <div class="text-xs text-gray-500 uppercase mb-1">Time to Lights Out</div>
+                    <div id="countdown" class="text-4xl font-mono text-white font-bold tabular-nums">00 : 00 : 00 : 00
+                    </div>
+                </div>
+            </div>
+            <!-- Season Progress -->
+            <div class="mt-6">
+                <div class="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Season Progress</span>
+                    <span id="season-progress-text">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 h-1.5 rounded-full overflow-hidden">
+                    <div id="season-progress" class="bg-f1red h-full w-0 transition-all duration-1000"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEWS -->
+
+        <!-- 1. SCHEDULE VIEW -->
+        <div id="schedule-view" class="view-section">
+            <div class="module-header mb-6">
+                <h2 id="schedule-title" class="text-2xl font-heading text-white">2026 Season Schedule</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="races-list">
+                <!-- Cards injected here -->
+            </div>
+        </div>
+
+        <!-- 2. RESULTS VIEW (Tabbed) -->
+        <div id="results-view" class="view-section" style="display: none;">
+            <div class="module-header flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
+                <h2 class="text-3xl font-heading text-white">Race Results</h2>
+
+                <div class="flex flex-col md:flex-row items-center gap-4">
+                    <!-- Tabs -->
+                    <div class="results-subnav flex bg-gray-800 rounded-lg p-1 border border-gray-700">
+                        <button class="px-6 py-2 rounded-md text-sm font-bold bg-accent text-white transition-all"
+                            data-tab="races">Races</button>
+                        <button class="px-6 py-2 rounded-md text-sm text-gray-400 hover:text-white transition-all"
+                            data-tab="drivers">Drivers</button>
+                        <button class="px-6 py-2 rounded-md text-sm text-gray-400 hover:text-white transition-all"
+                            data-tab="teams">Teams</button>
+                    </div>
+
+                    <!-- Year Selector -->
+                    <div class="year-filter flex items-center bg-gray-800 rounded-lg px-4 py-2 border border-gray-700">
+                        <label class="text-sm text-gray-400 mr-3 font-bold">Season</label>
+                        <select id="results-year-select"
+                            class="bg-transparent text-white font-bold focus:outline-none cursor-pointer">
+                            <option value="2026">2026</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                            <option value="2022">2022</option>
+                            <option value="2021">2021</option>
+                            <option value="2020">2020</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RACES TAB -->
+            <div id="results-content-races" class="results-tab-content">
+                <div class="glass-panel overflow-hidden border border-gray-800 rounded-xl">
+                    <table class="w-full text-left" id="results-table">
+                        <thead>
+                            <tr class="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-medium">Round</th>
+                                <th class="p-4 font-medium">Grand Prix</th>
+                                <th class="p-4 font-medium">Date</th>
+                                <th class="p-4 font-medium">Winner</th>
+                                <th class="p-4 font-medium">Team</th>
+                                <th class="p-4 font-medium text-right">Time</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-list" class="text-sm divide-y divide-gray-800">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- DRIVERS TAB -->
+            <div id="results-content-drivers" class="results-tab-content" style="display: none;">
+                <div class="glass-panel overflow-hidden border border-gray-800 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-medium w-16 text-center">Pos</th>
+                                <th class="p-4 font-medium">Driver</th>
+                                <th class="p-4 font-medium">Nationality</th>
+                                <th class="p-4 font-medium">Team</th>
+                                <th class="p-4 font-medium text-right">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-drivers-list" class="text-sm divide-y divide-gray-800">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- TEAMS TAB -->
+            <div id="results-content-teams" class="results-tab-content" style="display: none;">
+                <div class="glass-panel overflow-hidden border border-gray-800 rounded-xl">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-gray-800/50 text-gray-400 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-medium w-16 text-center">Pos</th>
+                                <th class="p-4 font-medium">Team</th>
+                                <th class="p-4 font-medium text-right">Pts</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-teams-list" class="text-sm divide-y divide-gray-800">
+                            <!-- JS Populated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. DRIVERS VIEW -->
+        <div id="drivers-view" class="view-section" style="display: none;">
+            <div class="module-header mb-6">
+                <h2 class="text-2xl font-heading text-white">Driver Standings 2025</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6" id="drivers-grid">
+                <!-- Driver Cards -->
+            </div>
+        </div>
+
+        <!-- 4. CONSTRUCTORS VIEW -->
+        <div id="constructors-view" class="view-section" style="display: none;">
+            <div class="module-header mb-6">
+                <h2 class="text-2xl font-heading text-white">Constructor Standings 2025</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="teams-grid">
+                <!-- Team Cards -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-cardbg border-t border-gray-800 py-8 mt-8">
+        <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+            <p>&copy; 2026 F1 Data Hub. unofficial.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL -->
+    <div id="race-modal"
+        class="fixed inset-0 bg-black bg-opacity-80 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+        <div
+            class="bg-cardbg rounded-xl max-w-2xl w-full mx-4 overflow-hidden shadow-2xl border border-gray-700 flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-gray-700 flex justify-between items-center bg-gray-900">
+                <h3 class="text-xl font-bold text-white uppercase tracking-wider">Race Information</h3>
+                <button
+                    class="close-modal text-gray-400 hover:text-white hover:bg-gray-800 rounded-full p-2 transition-colors">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+            <div class="p-6 overflow-y-auto" id="modal-body">
+                <!-- Loaded dynamically -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}?v=8433"></script>
+</body>
+
+</html>
