@@ -137,6 +137,20 @@ def fetch_race_results(season, round_no):
         # Clear existing if any
         Result.query.filter_by(race_id=race.id).delete()
         
+        # Check sprint points
+        sprint_points = {}
+        try:
+            sprint_url = f"{BASE_URL}/{season}/{round_no}/sprint.json"
+            sprint_resp = requests.get(sprint_url, timeout=5)
+            if sprint_resp.status_code == 200:
+                s_data = sprint_resp.json()
+                s_races = s_data.get('MRData', {}).get('RaceTable', {}).get('Races', [])
+                if s_races:
+                    for sr in s_races[0].get('SprintResults', []):
+                        sprint_points[sr['Driver']['driverId']] = float(sr['points'])
+        except Exception as e:
+            print(f"  Sprint fetch error: {e}")
+            
         results = race_data.get('Results', [])
         for res_data in results:
             driver_data = res_data['Driver']
@@ -156,12 +170,15 @@ def fetch_race_results(season, round_no):
             
             time_str = res_data.get('Time', {}).get('time', status)
             
+            # Combine Sprint points with Main Race points
+            sp_pts = sprint_points.get(driver_data['driverId'], 0.0)
+            
             new_result = Result(
                 race_id=race.id,
                 driver_id=driver.id,
                 constructor_id=constructor.id,
                 position=position,
-                points=points,
+                points=points + sp_pts,
                 grid=grid,
                 laps=laps,
                 status=status,
