@@ -298,14 +298,17 @@ def get_constructor_standings():
     
     data = []
     
-    if not standings_query and season == 2025:
+    if not standings_query:
+         # Fallback: show all teams for the season (0 points)
          teams = Constructor.query.all()
          for t in teams:
              data.append({
                 'position': 0,
                 'constructor_name': t.name,
                 'points': 0,
-                'car_image_url': t.car_image_url
+                'car_image_url': t.car_image_url,
+                'sponsors': t.sponsors,
+                'base': t.base
              })
     else:
         for i, (constructor_id, points) in enumerate(standings_query):

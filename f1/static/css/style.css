@@ -106,6 +106,7 @@ body {
 
 .f1-select option {
     background-color: var(--f1-black);
+    color: white;
 }
 
 /* App Container */

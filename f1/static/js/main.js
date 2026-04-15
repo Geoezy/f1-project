@@ -163,7 +163,7 @@ class F1App {
                 <tr class="hover:bg-white/5 cursor-pointer border-b border-gray-800" onclick="app.switchView('constructors')">
                     <td class="p-4 font-bold text-white text-center">${t.position}</td>
                     <td class="p-4 font-bold flex items-center gap-6">
-                        ${t.car_image_url ? `<img src="${t.car_image_url}" class="w-32 h-12 object-contain">` : ''}
+                        ${t.car_image_url ? `<img src="${t.car_image_url}" class="w-24 h-8 object-contain">` : ''}
                         <span class="text-lg">${t.constructor_name}</span>
                     </td>
                     <td class="p-4 text-right font-bold text-accent text-lg">${t.points}</td>
@@ -491,9 +491,9 @@ class F1App {
 
         grid.innerHTML = teams.map(t => `
             <div class="glass-panel p-0 overflow-hidden group">
-                 <div class="h-40 bg-gray-800 p-4 flex items-center justify-center relative">
+                 <div class="h-40 bg-cardbg p-4 flex items-center justify-center relative overflow-hidden">
                       <img src="${t.car_image_url || ''}" 
-                           class="w-full h-auto object-contain transition-transform duration-500 group-hover:scale-110"
+                           class="w-full h-full object-contain transition-transform duration-500 group-hover:scale-110"
                            onerror="this.src='https://placehold.co/400x200/333/FFF.png?text=F1+Car'">
                  </div>
                  <div class="p-6">

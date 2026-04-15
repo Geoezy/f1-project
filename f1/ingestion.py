@@ -1,5 +1,5 @@
 import requests
-import fcntl
+
 import os
 import datetime
 from extensions import db
